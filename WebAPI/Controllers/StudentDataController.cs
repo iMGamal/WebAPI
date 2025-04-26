@@ -46,20 +46,22 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] StudentData student, IFormFile imageFile)
+        public async Task<IActionResult> Add([FromForm] StudentData student)
         {
-            if (imageFile != null && imageFile.Length > 0)
-            {
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", uniqueFileName);
+            student.StudentId = 0;
 
-                var directory = Path.GetDirectoryName(imagePath);
-                if (!Directory.Exists(directory))
-                    Directory.CreateDirectory(directory);
+            if (student.StudentImage != null && student.StudentImage.Length > 0)
+            {
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(student.StudentImage.FileName);
+
+                var imagesFolder = Path.Combine("wwwroot", "images");
+                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), imagesFolder, uniqueFileName);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(imagePath));
 
                 using (var stream = new FileStream(imagePath, FileMode.Create))
                 {
-                    await imageFile.CopyToAsync(stream);
+                    await student.StudentImage.CopyToAsync(stream);
                 }
 
                 student.ImagePath = "/images/" + uniqueFileName;
@@ -70,22 +72,30 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{studentId}")]
-        public async Task<IActionResult> Edit([FromForm] StudentData student, int studentId, IFormFile imageFile = null)
+        public async Task<IActionResult> Edit(int studentId, [FromForm] StudentUpdateModel updateModel)
         {
-            if (studentId != student.StudentId)
-                return BadRequest("ID in URL doesn't match ID in student data");
-
             var existingStudent = _service.GetStudentById(studentId);
             if (existingStudent == null)
                 return NotFound($"Student with ID {studentId} not found");
 
-            existingStudent.StudentName = student.StudentName;
-            existingStudent.StudentAge = student.StudentAge;
-            existingStudent.StudentAddress = student.StudentAddress;
-            existingStudent.StudentPhoneNumber = student.StudentPhoneNumber;
-            existingStudent.StudentBirthDate = student.StudentBirthDate;
+            // Update only non-null properties
+            if (updateModel.StudentName != null)
+                existingStudent.StudentName = updateModel.StudentName;
 
-            if (imageFile != null && imageFile.Length > 0)
+            if (updateModel.StudentAge.HasValue)
+                existingStudent.StudentAge = updateModel.StudentAge.Value;
+
+            if (updateModel.StudentAddress != null)
+                existingStudent.StudentAddress = updateModel.StudentAddress;
+
+            if (updateModel.StudentPhoneNumber != null)
+                existingStudent.StudentPhoneNumber = updateModel.StudentPhoneNumber;
+
+            if (updateModel.StudentBirthDate.HasValue)
+                existingStudent.StudentBirthDate = updateModel.StudentBirthDate.Value;
+
+            // Handle file upload
+            if (updateModel.StudentImage != null && updateModel.StudentImage.Length > 0)
             {
                 if (!string.IsNullOrEmpty(existingStudent.ImagePath))
                 {
@@ -94,12 +104,14 @@ namespace WebAPI.Controllers
                         System.IO.File.Delete(oldImagePath);
                 }
 
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                // Fixed: Changed student.StudentImage to updateModel.StudentImage
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(updateModel.StudentImage.FileName);
                 var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", uniqueFileName);
 
                 using (var stream = new FileStream(imagePath, FileMode.Create))
                 {
-                    await imageFile.CopyToAsync(stream);
+                    // Fixed: Changed student.StudentImage to updateModel.StudentImage
+                    await updateModel.StudentImage.CopyToAsync(stream);
                 }
 
                 existingStudent.ImagePath = "/images/" + uniqueFileName;

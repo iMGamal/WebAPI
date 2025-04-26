@@ -43,9 +43,6 @@ namespace WebAPI.Migrations
                     b.Property<DateOnly>("StudentBirthDate")
                         .HasColumnType("date");
 
-                    b.Property<byte[]>("StudentImage")
-                        .HasColumnType("varbinary(max)");
-
                     b.Property<string>("StudentName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

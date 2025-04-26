@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class TestCase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,7 +20,6 @@ namespace WebAPI.Migrations
                     StudentName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StudentAge = table.Column<int>(type: "int", nullable: false),
                     ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StudentImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     StudentAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StudentPhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StudentBirthDate = table.Column<DateOnly>(type: "date", nullable: false)

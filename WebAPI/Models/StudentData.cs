@@ -10,7 +10,8 @@ namespace WebAPI.Models
         public string StudentName { get; set; }
         public int StudentAge { get; set; }
         public string? ImagePath { get; set; }
-        public byte[]? StudentImage { get; set; }
+        [NotMapped]
+        public IFormFile? StudentImage { get; set; }
         public string StudentAddress { get; set; }
         public string StudentPhoneNumber { get; set; }
         public DateOnly StudentBirthDate { get; set; }

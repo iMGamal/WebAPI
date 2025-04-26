@@ -12,8 +12,8 @@ using WebAPI.DataAccess;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(WebAPIContext))]
-    [Migration("20250424121935_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250426185133_TestCase")]
+    partial class TestCase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,9 +45,6 @@ namespace WebAPI.Migrations
 
                     b.Property<DateOnly>("StudentBirthDate")
                         .HasColumnType("date");
-
-                    b.Property<byte[]>("StudentImage")
-                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("StudentName")
                         .IsRequired()
